@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../components/Header';
 import { useAuth } from '../context/AuthContext';
-import { Sliders, Shield, Key, Bell, Server } from 'lucide-react';
+import { Sliders, Shield, Key, Bell } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();

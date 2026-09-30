@@ -1,163 +1,116 @@
-import { AlertItem, DashboardStats, AuthorityUser, AuditLog } from '../types';
+import { AlertItem, DashboardStats, AuthorityUser, AuditLog, AlertStatus } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
+const DEMO_USERS: Record<string, { password: string; user: AuthorityUser }> = {
+  'admin@shesecure.org': {
+    password: 'AdminPassword123!',
+    user: { id: 'demo-admin', email: 'admin@shesecure.org', name: 'Admin User', role: 'ADMIN' }
+  },
+  'operator@shesecure.org': {
+    password: 'OperatorPassword123!',
+    user: { id: 'demo-operator', email: 'operator@shesecure.org', name: 'Response Operator', role: 'OPERATOR' }
+  },
+  'viewer@shesecure.org': {
+    password: 'ViewerPassword123!',
+    user: { id: 'demo-viewer', email: 'viewer@shesecure.org', name: 'Read-only Viewer', role: 'VIEWER' }
+  }
+};
+
+const now = new Date();
+const DEMO_ALERTS: AlertItem[] = [
+  {
+    id: 'alert-demo-001', deviceId: 'device-maya-104', timestamp: new Date(now.getTime() - 8 * 60 * 1000).toISOString(),
+    latitude: 40.7128, longitude: -74.006, accuracy: 12, triggerType: 'STEALTH_GESTURE', status: 'ACTIVE',
+    isEncrypted: true, transportProtocol: 'INTERNET_DIRECT', createdAt: new Date(now.getTime() - 8 * 60 * 1000).toISOString(), updatedAt: now.toISOString(),
+    decryptedPayload: { alertId: 'alert-demo-001', deviceId: 'device-maya-104', timestamp: now.toISOString(), triggerType: 'STEALTH_GESTURE', location: { latitude: 40.7128, longitude: -74.006, accuracy: 12 }, batteryLevel: 68, notes: 'Assistance requested', isDemo: true }
+  },
+  {
+    id: 'alert-demo-002', deviceId: 'device-sana-221', timestamp: new Date(now.getTime() - 34 * 60 * 1000).toISOString(),
+    latitude: 34.0522, longitude: -118.2437, accuracy: 24, triggerType: 'SILENT_SEQUENCE', status: 'RESPONDING',
+    isEncrypted: true, transportProtocol: 'BLE_MESH_RELAY', relayHopCount: 2, createdAt: new Date(now.getTime() - 34 * 60 * 1000).toISOString(), updatedAt: now.toISOString(),
+    decryptedPayload: { alertId: 'alert-demo-002', deviceId: 'device-sana-221', timestamp: now.toISOString(), triggerType: 'SILENT_SEQUENCE', location: { latitude: 34.0522, longitude: -118.2437, accuracy: 24 }, batteryLevel: 41, notes: 'Alert relayed through mesh', isDemo: true }
+  },
+  {
+    id: 'alert-demo-003', deviceId: 'demo-browser-simulator', timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+    latitude: 51.5074, longitude: -0.1278, accuracy: 18, triggerType: 'DEMO', status: 'ACKNOWLEDGED',
+    isEncrypted: false, transportProtocol: 'INTERNET_DIRECT', createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(), updatedAt: now.toISOString(),
+    decryptedPayload: { alertId: 'alert-demo-003', deviceId: 'demo-browser-simulator', timestamp: now.toISOString(), triggerType: 'DEMO', location: { latitude: 51.5074, longitude: -0.1278, accuracy: 18 }, batteryLevel: 95, notes: 'Demo alert acknowledged', isDemo: true }
+  }
+];
+
+let alerts = [...DEMO_ALERTS];
+const auditLogs: AuditLog[] = [];
+const getUser = () => {
+  const email = localStorage.getItem('shesecure_demo_user') || 'operator@shesecure.org';
+  return DEMO_USERS[email]?.user || DEMO_USERS['operator@shesecure.org'].user;
+};
 
 class ApiService {
-  private getHeaders(): HeadersInit {
-    const token = localStorage.getItem('shesecure_token');
-    return {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    };
-  }
-
   public async login(email: string, password: string): Promise<{ user: AuthorityUser; token: string }> {
-    const res = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Login failed');
-    }
-    return { user: data.data.user, token: data.data.tokens.accessToken };
+    const account = DEMO_USERS[email.toLowerCase()];
+    if (!account || account.password !== password) throw new Error('Invalid demo credentials. Use one of the Quick Switch roles.');
+    const token = `demo-token-${account.user.id}`;
+    localStorage.setItem('shesecure_demo_user', account.user.email);
+    return { user: account.user, token };
   }
 
   public async getMe(): Promise<AuthorityUser> {
-    const res = await fetch(`${API_BASE}/auth/me`, {
-      headers: this.getHeaders()
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to fetch session');
-    }
-    return data.data.user;
+    const token = localStorage.getItem('shesecure_token');
+    if (!token) throw new Error('No active demo session');
+    return getUser();
   }
 
   public async getStats(): Promise<DashboardStats> {
-    const res = await fetch(`${API_BASE}/alerts/stats`, {
-      headers: this.getHeaders()
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to fetch metrics');
-    }
-    return data.data;
-  }
-
-  public async getAlerts(filter: { status?: string; triggerType?: string; limit?: number; offset?: number } = {}): Promise<{ alerts: AlertItem[]; total: number }> {
-    const params = new URLSearchParams();
-    if (filter.status) params.append('status', filter.status);
-    if (filter.triggerType) params.append('triggerType', filter.triggerType);
-    if (filter.limit) params.append('limit', String(filter.limit));
-    if (filter.offset) params.append('offset', String(filter.offset));
-
-    const res = await fetch(`${API_BASE}/alerts?${params.toString()}`, {
-      headers: this.getHeaders()
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to fetch alerts');
-    }
-    return { alerts: data.data, total: data.pagination?.total ?? data.data.length };
-  }
-
-  public async getAlertById(alertId: string): Promise<AlertItem> {
-    const res = await fetch(`${API_BASE}/alerts/${alertId}`, {
-      headers: this.getHeaders()
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to fetch alert details');
-    }
-    return data.data;
-  }
-
-  public async acknowledgeAlert(alertId: string, notes?: string): Promise<AlertItem> {
-    const res = await fetch(`${API_BASE}/alerts/${alertId}/acknowledge`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify({ notes })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to acknowledge alert');
-    }
-    return data.data;
-  }
-
-  public async updateAlertStatus(alertId: string, status: string, reason?: string): Promise<AlertItem> {
-    const res = await fetch(`${API_BASE}/alerts/${alertId}/status`, {
-      method: 'PATCH',
-      headers: this.getHeaders(),
-      body: JSON.stringify({ status, reason })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to update alert status');
-    }
-    return data.data;
-  }
-
-  public async triggerTestDemoAlert(payload: { latitude: number; longitude: number; accuracy: number; notes: string }): Promise<AlertItem> {
-    // Generate AES-256 encrypted payload structure
-    const alertId = `demo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
-    const timestamp = new Date().toISOString();
-    
-    // In demo trigger, construct envelope for backend decryption
-    const rawPayload = {
-      alertId,
-      deviceId: 'demo-browser-simulator',
-      timestamp,
-      triggerType: 'DEMO',
-      location: {
-        latitude: payload.latitude,
-        longitude: payload.longitude,
-        accuracy: payload.accuracy,
-        capturedAt: timestamp
-      },
-      batteryLevel: 95,
-      isDemo: true,
-      notes: payload.notes || 'Simulated distress alert from Dashboard Demo Console'
+    return {
+      active: alerts.filter((a) => a.status === 'ACTIVE').length,
+      unacknowledged: alerts.filter((a) => !['ACKNOWLEDGED', 'RESPONDING', 'RESOLVED', 'DISMISSED'].includes(a.status)).length,
+      responding: alerts.filter((a) => a.status === 'RESPONDING').length,
+      resolved: alerts.filter((a) => a.status === 'RESOLVED').length,
+      total: alerts.length
     };
-
-    // Client-side simulation of envelope format using standard base64/dummy key for demo API
-    // Or call standard backend JSON alert submission endpoint
-    const res = await fetch(`${API_BASE}/alerts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        alertId,
-        deviceId: 'demo-browser-simulator',
-        timestamp,
-        triggerType: 'DEMO',
-        encryptedPayload: {
-          version: 1,
-          keyId: 'key-v1',
-          // Base64 demo payload
-          nonce: btoa('123456789012'),
-          ciphertext: btoa(JSON.stringify(rawPayload)),
-          tag: btoa('1234567890123456')
-        }
-      })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to trigger test alert');
-    }
-    return data.data;
   }
 
-  public async getAuditLogs(limit = 100, offset = 0): Promise<{ logs: AuditLog[]; total: number }> {
-    const res = await fetch(`${API_BASE}/audit?limit=${limit}&offset=${offset}`, {
-      headers: this.getHeaders()
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to fetch audit trail');
-    }
-    return { logs: data.data, total: data.pagination?.total ?? data.data.length };
+  public async getAlerts(filter: { status?: string; triggerType?: string; limit?: number; offset?: number } = {}) {
+    let result = alerts.filter((alert) => (!filter.status || alert.status === filter.status) && (!filter.triggerType || alert.triggerType === filter.triggerType));
+    const offset = filter.offset || 0;
+    result = result.slice(offset, offset + (filter.limit || result.length));
+    return { alerts: result, total: alerts.length };
+  }
+
+  public async getAlertById(alertId: string) {
+    const alert = alerts.find((item) => item.id === alertId);
+    if (!alert) throw new Error('Alert not found');
+    return alert;
+  }
+
+  public async acknowledgeAlert(alertId: string, notes?: string) {
+    return this.updateAlert(alertId, 'ACKNOWLEDGED', notes);
+  }
+
+  public async updateAlertStatus(alertId: string, status: string, reason?: string) {
+    return this.updateAlert(alertId, status as AlertStatus, reason);
+  }
+
+  private async updateAlert(alertId: string, status: AlertStatus, reason?: string) {
+    const index = alerts.findIndex((item) => item.id === alertId);
+    if (index < 0) throw new Error('Alert not found');
+    alerts[index] = { ...alerts[index], status, updatedAt: new Date().toISOString(), decryptedPayload: { ...alerts[index].decryptedPayload!, notes: reason || alerts[index].decryptedPayload?.notes } };
+    auditLogs.unshift({ id: `audit-${Date.now()}`, authorityId: getUser().id, authorityEmail: getUser().email, authorityRole: getUser().role, alertId, action: `STATUS_${status}`, timestamp: new Date().toISOString(), metadata: { reason } });
+    return alerts[index];
+  }
+
+  public async triggerTestDemoAlert(payload: { latitude: number; longitude: number; accuracy: number; notes: string }) {
+    const timestamp = new Date().toISOString();
+    const alert: AlertItem = {
+      id: `demo-${Date.now()}`, deviceId: 'demo-browser-simulator', timestamp, latitude: payload.latitude, longitude: payload.longitude, accuracy: payload.accuracy,
+      triggerType: 'DEMO', status: 'ACTIVE', isEncrypted: false, transportProtocol: 'INTERNET_DIRECT', createdAt: timestamp, updatedAt: timestamp,
+      decryptedPayload: { alertId: `demo-${Date.now()}`, deviceId: 'demo-browser-simulator', timestamp, triggerType: 'DEMO', location: { latitude: payload.latitude, longitude: payload.longitude, accuracy: payload.accuracy }, batteryLevel: 95, notes: payload.notes, isDemo: true }
+    };
+    alerts = [alert, ...alerts];
+    return alert;
+  }
+
+  public async getAuditLogs(limit = 100, offset = 0) {
+    return { logs: auditLogs.slice(offset, offset + limit), total: auditLogs.length };
   }
 }
 

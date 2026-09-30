@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { api } from '../services/api';
 import { AuditLog } from '../types';
-import { History, Shield, RefreshCw, UserCheck, ShieldAlert, Eye, CheckCircle, RefreshCcw } from 'lucide-react';
+import { History, Shield, RefreshCw, UserCheck, ShieldAlert, Eye, CheckCircle } from 'lucide-react';
 
 export const AuditLogsPage: React.FC = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);

@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-le
 import L from 'leaflet';
 import { AlertItem } from '../types';
 import { StatusBadge } from './StatusBadge';
-import { MapPin, Navigation, Battery, ShieldAlert } from 'lucide-react';
+import { MapPin, ShieldAlert } from 'lucide-react';
 
 interface AlertMapProps {
   alerts: AlertItem[];

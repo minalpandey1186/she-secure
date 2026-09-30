@@ -52,7 +52,6 @@ export function useAlerts(pollIntervalMs = 5000) {
     if (selectedAlert?.id === alertId) {
       setSelectedAlert(updated);
     }
-    return updated;
   };
 
   const updateStatus = async (alertId: string, status: string, reason?: string) => {
@@ -61,7 +60,6 @@ export function useAlerts(pollIntervalMs = 5000) {
     if (selectedAlert?.id === alertId) {
       setSelectedAlert(updated);
     }
-    return updated;
   };
 
   return {
