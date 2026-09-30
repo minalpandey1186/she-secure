@@ -1,0 +1,149 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AuthorityRole {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum AlertStatus {
+  CREATED
+  ENCRYPTED
+  QUEUED
+  SENDING
+  DELIVERED
+  FAILED
+  RETRYING
+  ACTIVE
+  ACKNOWLEDGED
+  RESPONDING
+  RESOLVED
+  DISMISSED
+}
+
+enum TriggerType {
+  STEALTH_GESTURE
+  SILENT_SEQUENCE
+  MANUAL
+  DEMO
+}
+
+enum TransportProtocol {
+  INTERNET_DIRECT
+  BLE_MESH_RELAY
+  SMS_FALLBACK
+  STEGO_IMAGE
+}
+
+enum DeliveryChannel {
+  TELEGRAM
+  DASHBOARD
+  SMS_BACKUP
+  BLE_MESH
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRYING
+}
+
+model Authority {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         AuthorityRole @default(VIEWER)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  auditLogs    AuditLog[]
+
+  @@map("authorities")
+}
+
+model Device {
+  id           String    @id @default(uuid())
+  deviceId     String    @unique
+  deviceModel  String?
+  osVersion    String?
+  appVersion   String?
+  publicKey    String?
+  status       String    @default("ACTIVE")
+  registeredAt DateTime  @default(now())
+  lastActiveAt DateTime  @default(now())
+  alerts       Alert[]
+
+  @@map("devices")
+}
+
+model Alert {
+  id                String            @id // Client-provided idempotency key / alertId
+  deviceId          String
+  device            Device?           @relation(fields: [deviceId], references: [deviceId])
+  timestamp         DateTime
+  latitude          Float?
+  longitude         Float?
+  accuracy          Float?
+  triggerType       TriggerType       @default(STEALTH_GESTURE)
+  status            AlertStatus       @default(ACTIVE)
+  isEncrypted       Boolean           @default(true)
+  transportProtocol TransportProtocol @default(INTERNET_DIRECT)
+  relayedByDeviceId String?
+  relayHopCount     Int?
+  rawPayload        Json?
+  decryptedPayload  Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deliveries        AlertDelivery[]
+  auditLogs         AuditLog[]
+
+  @@index([timestamp])
+  @@index([status])
+  @@index([deviceId])
+  @@index([transportProtocol])
+  @@map("alerts")
+}
+
+model AlertDelivery {
+  id          String          @id @default(uuid())
+  alertId     String
+  alert       Alert           @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  channel     DeliveryChannel
+  status      DeliveryStatus  @default(PENDING)
+  attempts    Int             @default(0)
+  lastError   String?
+  deliveredAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([alertId])
+  @@index([status])
+  @@map("alert_deliveries")
+}
+
+model AuditLog {
+  id          String     @id @default(uuid())
+  authorityId String?
+  authority   Authority? @relation(fields: [authorityId], references: [id])
+  alertId     String?
+  alert       Alert?     @relation(fields: [alertId], references: [id], onDelete: SetNull)
+  action      String
+  timestamp   DateTime   @default(now())
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+
+  @@index([timestamp])
+  @@index([authorityId])
+  @@index([alertId])
+  @@map("audit_logs")
+}

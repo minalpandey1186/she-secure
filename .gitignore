@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.dart_tool/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# Android Gradle & Build
+.gradle/
+build/
+app/build/
+*.class
+*.apk
+*.aab
+*.dex
+local.properties
+.cxx/
+captures/
+
+# Environment and Secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.cert
+
+# Build artifacts & packages
+dist/
+*.ipa
+
+# Logs and databases
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.sqlite
+*.sqlite3
+*.db
+postgres_data/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

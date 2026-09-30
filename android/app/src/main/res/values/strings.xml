@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">SheSecure</string>
+    <string name="app_tagline">Smart Women Safety System</string>
+
+    <string name="title_emergency_contacts">Emergency Contacts</string>
+    <string name="title_safe_route_finder">Safe Route Finder</string>
+    <string name="title_settings">Settings &amp; Sensitivity</string>
+    <string name="title_permissions">App Permissions</string>
+    <string name="title_sos_active">EMERGENCY SOS ACTIVE</string>
+
+    <string name="sos_manual_button">TRIGGER SOS</string>
+    <string name="sos_subtext">Tap to initiate 5s countdown</string>
+    <string name="cancel_sos">I AM SAFE (CANCEL)</string>
+
+    <!-- Services -->
+    <string name="service_motion">Motion Trigger (3 Jerks / 1.5s)</string>
+    <string name="service_audio">Audio Trigger (Scream Detection)</string>
+    <string name="service_status_active">Active &amp; Monitoring</string>
+    <string name="service_status_disabled">Disabled</string>
+
+    <!-- Safe Route -->
+    <string name="nearest_police_station">Nearest Police Station</string>
+    <string name="finding_stations">Locating nearby police stations…</string>
+    <string name="expanded_radius_notice">No stations within 5 km. Automatically expanded search to 15 km.</string>
+    <string name="start_walking_route">Start Walking Route</string>
+    <string name="call_police">Call 112</string>
+
+    <!-- Contacts -->
+    <string name="no_contacts_title">No Emergency Contacts</string>
+    <string name="no_contacts_msg">Add at least one trusted contact who will receive your SOS SMS and GPS location.</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="contact_name">Contact Name</string>
+    <string name="contact_phone">Phone Number (+91...)</string>
+    <string name="contact_relation">Relationship (e.g. Parent, Friend)</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+
+    <!-- Settings -->
+    <string name="settings_motion_title">Motion Sensitivity (Jerk Threshold)</string>
+    <string name="settings_audio_title">Audio Sensitivity (Decibel Threshold)</string>
+    <string name="settings_countdown_title">Countdown Duration (Seconds)</string>
+    <string name="settings_sms_template">Emergency SMS Template</string>
+    <string name="default_sms_body">EMERGENCY! I need immediate help! My live location is: {LOCATION} (Accuracy: {ACCURACY}m). Time: {TIME}</string>
+
+    <!-- Fail-Visibly Messages -->
+    <string name="err_no_contacts">FAIL-VISIBLY: No emergency contacts saved. SOS could not be sent!</string>
+    <string name="err_no_location">FAIL-VISIBLY: GPS location unavailable. Sending SOS with last known coordinates.</string>
+    <string name="err_sms_failed">FAIL-VISIBLY: SMS dispatch failed to some contacts. Check carrier signal.</string>
+    <string name="err_perm_missing">FAIL-VISIBLY: Required permission is missing.</string>
+    <string name="sos_dispatched_success">SOS successfully dispatched via SMS with live GPS coordinates.</string>
+</resources>

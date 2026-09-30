@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHE SECURE: Smart Women Safety System — Mobile App &amp; Simulator</title>
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10B981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310B981'/><text y='.9em' font-size='80' x='10'>🛡️</text></svg>">
+
+    <!-- Leaflet CSS for Safe Route Finder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Project Banner -->
+    <header class="project-header">
+        <div class="header-left">
+            <div class="badge-sdg">SDG 11 &amp; 16</div>
+            <h1>SHE SECURE <span>• Smart Women Safety System</span></h1>
+            <p class="team-meta">BMS Institute of Technology &amp; Management • Interdisciplinary Exhibition 2026 | CSE • CSBS • ECE</p>
+        </div>
+        <div class="header-right">
+            <button class="btn-demo-action btn-phone" onclick="openPhoneDeployModal()">📱 Open on Android Phone</button>
+            <button class="btn-demo-action" onclick="openOnboardingModal()">🗣️ Secret Code Word</button>
+            <button class="btn-demo-action" onclick="simulateMotionTrigger()">📳 Shake / 3 Jerks</button>
+            <button class="btn-demo-action btn-danger" onclick="triggerSosManually()">🚨 Trigger SOS</button>
+        </div>
+    </header>
+
+    <!-- Main Container: Presentation Layout + Mobile Frame -->
+    <div class="app-layout">
+
+        <!-- Left Info & Sensor Testing Studio -->
+        <aside class="sidebar-panel">
+            <div class="panel-card">
+                <h3>⚡ Real-Time Sensor Lab</h3>
+                <p class="panel-sub">Live physical phone accelerometer force and voice codeword recognition.</p>
+                
+                <!-- Motion Jerk Simulator & Real-Time Gauge -->
+                <div class="sensor-test-box">
+                    <div class="sensor-header">
+                        <span class="sensor-title">📳 Phone Accelerometer</span>
+                        <span class="sensor-badge" id="jerkStatusBadge">3 Jerks / 1.5s</span>
+                    </div>
+
+                    <!-- Live Real-Time Force Gauge -->
+                    <div class="accel-meter-container">
+                        <div class="accel-meter-fill" id="accelMeterFill"></div>
+                    </div>
+                    <div class="accel-debug-values" id="accelDebugValues">Shake phone to see live force</div>
+
+                    <div class="jerk-progress-bar" style="margin-top: 8px;">
+                        <div class="jerk-step" id="jerkStep1"></div>
+                        <div class="jerk-step" id="jerkStep2"></div>
+                        <div class="jerk-step" id="jerkStep3"></div>
+                    </div>
+                    <button class="btn-sensor-action" onclick="recordSimulatedJerk()">Simulate Jerk (Tap 3x within 1.5s)</button>
+                    <button class="btn-sensor-subaction" onclick="requestMotionPermission(true)">Enable / Test Phone Accelerometer</button>
+                </div>
+
+                <!-- Secret Voice Code Word Box -->
+                <div class="sensor-test-box">
+                    <div class="sensor-header">
+                        <span class="sensor-title">🗣️ Secret Voice Code Word</span>
+                        <span class="sensor-badge" id="voiceSentinelBadge">Voice Sentinel Active</span>
+                    </div>
+                    <p class="db-subtext" id="voiceLiveTranscript">Say your secret word anytime to trigger SOS.</p>
+                    <button class="btn-sensor-action" onclick="openOnboardingModal()">Change Secret Code Word</button>
+                </div>
+
+                <!-- Audio Scream Detector -->
+                <div class="sensor-test-box">
+                    <div class="sensor-header">
+                        <span class="sensor-title">🎙️ Audio Scream Sentinel</span>
+                        <span class="sensor-badge" id="audioStatusBadge">~1s Sustained Peak</span>
+                    </div>
+                    <div class="db-meter-container">
+                        <div class="db-meter-fill" id="dbMeterFill"></div>
+                        <span class="db-value" id="dbValueText">0 dB</span>
+                    </div>
+                    <button class="btn-sensor-action" id="btnToggleMic" onclick="toggleMicrophoneDetection()">Start Live Microphone Listener</button>
+                </div>
+            </div>
+
+            <!-- Emergency Dispatch Channels -->
+            <div class="panel-card">
+                <h3>📡 Direct Automated Emergency Alerting</h3>
+                <div class="pillar-row">
+                    <span class="pillar-tag it">DIRECT SMS</span>
+                    <p><strong>Automated Direct SMS:</strong> Dispatched automatically by system in background without asking user.</p>
+                </div>
+                <div class="pillar-row">
+                    <span class="pillar-tag cse">EMAIL</span>
+                    <p><strong>Automated Email:</strong> Broadcasts live Google Maps location coordinates to all email contacts.</p>
+                </div>
+                <div class="pillar-row">
+                    <span class="pillar-tag ece">ROUTE</span>
+                    <p><strong>Safe Route:</strong> Direct pedestrian navigation to nearest police station (5km ➔ 15km).</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center: Mobile Device Shell -->
+        <main class="mobile-wrapper">
+            <div class="smartphone-frame">
+                <!-- Phone Top Speaker & Camera Notch -->
+                <div class="phone-notch">
+                    <div class="phone-speaker"></div>
+                    <div class="phone-camera"></div>
+                </div>
+
+                <!-- Phone Status Bar -->
+                <div class="phone-status-bar">
+                    <span class="status-time" id="statusClock">20:58</span>
+                    <div class="status-icons">
+                        <span>5G</span>
+                        <span>📶</span>
+                        <span>🔋 96%</span>
+                    </div>
+                </div>
+
+                <!-- Phone Screen Content (Tab Views) -->
+                <div class="phone-screen" id="phoneScreen">
+
+                    <!-- ============================================ -->
+                    <!-- TAB 1: HOME DASHBOARD -->
+                    <!-- ============================================ -->
+                    <div class="tab-view active" id="tabHome">
+                        <div class="app-topbar">
+                            <div class="brand">
+                                <span class="shield-icon">🛡️</span>
+                                <div>
+                                    <h2>SHE SECURE</h2>
+                                    <span class="brand-sub">Smart Women Safety System</span>
+                                </div>
+                            </div>
+                            <div class="topbar-actions">
+                                <button class="btn-icon" onclick="switchTab('tabSettings')" title="Settings">⚙️</button>
+                            </div>
+                        </div>
+
+                        <!-- Protection Status Card -->
+                        <div class="status-pill-banner" id="protectionStatusPill" onclick="openOnboardingModal()">
+                            <span class="pulse-dot"></span>
+                            <span id="protectionStatusText">Armed • Shake &amp; Voice ("HELP") Active</span>
+                        </div>
+
+                        <!-- One-Tap Mic & Voice Sentinel Activator -->
+                        <button type="button" id="btnHeroMic" class="btn-hero-mic" onclick="startLiveVoiceAndMic()">
+                            🎙️ Tap to Activate Voice &amp; Shouting Listener
+                        </button>
+
+                        <!-- SOS Trigger Button -->
+                        <div class="sos-container">
+                            <button class="giant-sos-button" id="mainSosBtn" onclick="triggerSosManually()">
+                                <div class="sos-text">SOS</div>
+                                <div class="sos-sub">PRESS FOR HELP</div>
+                                <div class="sos-timer-hint">5s Cancellable</div>
+                            </button>
+                        </div>
+
+                        <!-- Detection Triggers Row -->
+                        <div class="section-title">DETECTION TRIGGERS (SINGLE SHARED PATHWAY)</div>
+                        <div class="triggers-grid">
+                            <div class="trigger-card" onclick="requestMotionPermission(true)">
+                                <div class="trigger-icon">📳</div>
+                                <div class="trigger-info">
+                                    <strong>Accelerometer Shake</strong>
+                                    <span class="status-green">Any 3 Jerks (Armed)</span>
+                                </div>
+                            </div>
+                            <div class="trigger-card" onclick="openOnboardingModal()">
+                                <div class="trigger-icon">🗣️</div>
+                                <div class="trigger-info">
+                                    <strong>Voice / Shouting</strong>
+                                    <span class="status-green">Shout "HELP" or Custom</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Cards -->
+                        <div class="section-title">CORE SAFETY FEATURES</div>
+                        <div class="nav-card" onclick="switchTab('tabSafeRoute')">
+                            <div class="nav-card-icon">🗺️</div>
+                            <div class="nav-card-content">
+                                <strong>Safe Route Finder</strong>
+                                <span>Locate nearest police station &amp; walking route (5km ➔ 15km)</span>
+                            </div>
+                            <div class="nav-card-arrow">➔</div>
+                        </div>
+
+                        <div class="nav-card" onclick="switchTab('tabContacts')">
+                            <div class="nav-card-icon">👥</div>
+                            <div class="nav-card-content">
+                                <strong>Emergency Contacts</strong>
+                                <span id="homeContactsSummary">Offline Room DB • 3 Contacts Configured</span>
+                            </div>
+                            <div class="nav-card-arrow">➔</div>
+                        </div>
+
+                        <div class="app-footer-credit">
+                            BMS Institute of Technology &amp; Management • 2026
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- TAB 2: SOS COUNTDOWN & FAIL-VISIBLY ACTIVE ALERT -->
+                    <!-- ============================================ -->
+                    <div class="tab-view" id="tabSos">
+                        <!-- Countdown View -->
+                        <div id="sosCountdownView" class="sos-flow-panel">
+                            <div class="sos-alert-header">
+                                <h3>🚨 EMERGENCY DISTRESS TRIGGERED</h3>
+                                <p id="sosTriggerOriginLabel">Trigger Source: Motion Sensor (3 Jerks Detected)</p>
+                            </div>
+
+                            <div class="circular-countdown-wrap">
+                                <svg class="countdown-svg" viewBox="0 0 160 160">
+                                    <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+                                    <circle class="circle-progress" id="circleProgress" cx="80" cy="80" r="70"></circle>
+                                </svg>
+                                <div class="countdown-number" id="countdownSecText">5</div>
+                                <div class="countdown-label">SECONDS TO ALERT</div>
+                            </div>
+
+                            <p class="cancel-instruction">If this was accidental, tap the button below immediately.<br>No SMS, email, or siren will be sent.</p>
+
+                            <button class="btn-cancel-sos" onclick="cancelSos()">
+                                🛡️ I AM SAFE (CANCEL)
+                            </button>
+                        </div>
+
+                        <!-- Active Distress View -->
+                        <div id="sosActiveView" class="sos-flow-panel" style="display: none;">
+                            <div class="active-sos-banner">
+                                <span class="siren-pulse-icon">🚨</span>
+                                <div>
+                                    <h3>EMERGENCY PROTOCOL ENGAGED</h3>
+                                    <p>Direct SMS Sent • Email Broadcast • Siren Active • GPS Live</p>
+                                </div>
+                            </div>
+
+                            <!-- Fail-Visibly Audit Console -->
+                            <div class="fail-visibly-card">
+                                <div class="fail-visibly-header">
+                                    <span>📋 FAIL-VISIBLY AUDIT LOG (DIRECT SMS + EMAIL)</span>
+                                    <span class="badge-live">LIVE</span>
+                                </div>
+                                <div class="log-console" id="failVisiblyLogConsole">
+                                    <!-- Dynamic Logs -->
+                                </div>
+                            </div>
+
+                            <!-- Fallback Direct Intent Actions -->
+                            <div class="fallback-links-row" id="fallbackLinksContainer">
+                                <a id="btnDirectSmsFallback" href="#" class="btn-fallback-action">📱 View Native SMS Intent</a>
+                                <a id="btnDirectEmailFallback" href="#" class="btn-fallback-action">✉️ View Native Email Intent</a>
+                            </div>
+
+                            <div class="sos-actions-row">
+                                <button class="btn-control-action" id="btnMuteSiren" onclick="muteSiren()">🔇 Mute Siren</button>
+                                <a href="tel:112" class="btn-control-action btn-danger-action">📞 Call 112</a>
+                            </div>
+
+                            <button class="btn-dismiss-alert" onclick="dismissSosAlert()">Dismiss &amp; Return to Home</button>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- TAB 3: SAFE ROUTE FINDER -->
+                    <!-- ============================================ -->
+                    <div class="tab-view" id="tabSafeRoute">
+                        <div class="subpage-header">
+                            <button class="btn-back" onclick="switchTab('tabHome')">←</button>
+                            <div>
+                                <h3>Safe Route Finder</h3>
+                                <span class="subpage-sub">SDG 11 • Nearest Police Station &amp; Walking Route</span>
+                            </div>
+                            <button class="btn-header-refresh" onclick="fetchNearbyPoliceStations()" title="Refresh Location">🔄</button>
+                        </div>
+
+                        <!-- Search Radius Indicator (5km -> 15km) -->
+                        <div class="radius-status-banner" id="radiusBanner">
+                            <span id="radiusBannerIcon">📡</span>
+                            <span id="radiusBannerText">Searching within 5 km standard safety radius...</span>
+                        </div>
+
+                        <!-- Interactive Leaflet Map -->
+                        <div class="map-container-wrap">
+                            <div id="safeRouteMap"></div>
+                        </div>
+
+                        <!-- Active Route Summary -->
+                        <div class="selected-route-box" id="selectedRouteBox" style="display: none;">
+                            <div class="route-header">
+                                <strong id="selectedStationName">Yelahanka Police Station</strong>
+                                <span class="route-dist" id="selectedStationDist">850 m</span>
+                            </div>
+                            <div class="route-directions" id="selectedWalkingTime">
+                                🚶 ~11 min walk • Direct pedestrian pathway
+                            </div>
+                            <a id="btnExternalMaps" href="#" target="_blank" class="btn-route-action">Open Directions in Google Maps</a>
+                        </div>
+
+                        <!-- Stations List -->
+                        <div class="section-title">NEARBY POLICE STATIONS</div>
+                        <div class="stations-list" id="stationsListContainer">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- TAB 4: EMERGENCY CONTACTS -->
+                    <!-- ============================================ -->
+                    <div class="tab-view" id="tabContacts">
+                        <div class="subpage-header">
+                            <button class="btn-back" onclick="switchTab('tabHome')">←</button>
+                            <div>
+                                <h3>Emergency Contacts</h3>
+                                <span class="subpage-sub">Offline SQLite Room Database</span>
+                            </div>
+                        </div>
+
+                        <div class="info-callout">
+                            🔒 In an emergency, all contacts receive your live GPS coordinate link via <strong>Direct Automated SMS</strong> and <strong>Email</strong> without needing manual confirmation.
+                        </div>
+
+                        <!-- Contacts List -->
+                        <div class="contacts-list" id="contactsListContainer">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <button class="btn-add-contact" onclick="openAddContactModal()">+ Add Emergency Contact</button>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- TAB 5: SETTINGS & SENSITIVITY -->
+                    <!-- ============================================ -->
+                    <div class="tab-view" id="tabSettings">
+                        <div class="subpage-header">
+                            <button class="btn-back" onclick="switchTab('tabHome')">←</button>
+                            <div>
+                                <h3>Settings &amp; Sensitivity</h3>
+                                <span class="subpage-sub">Debounce &amp; Hardware Tuning</span>
+                            </div>
+                        </div>
+
+                        <!-- Secret Code Word -->
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <strong>🗣️ Secret Voice Code Word</strong>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleVoiceCodeWord" checked onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="setting-hint">Speaking this secret word/phrase triggers SOS automatically.</p>
+                            <input type="text" id="inputSecretCodeWord" class="setting-input" value="HELP" onchange="saveSettings()" style="text-transform: uppercase; font-weight: bold; color: var(--accent-emerald);">
+                        </div>
+
+                        <!-- Motion Sensitivity -->
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <strong>📳 Accelerometer Shake (3 Jerks / 1.5s)</strong>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleMotionService" checked onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="slider-group">
+                                <label>Shake Force Threshold: <strong id="labelMotionThreshold">8.5 m/s²</strong></label>
+                                <input type="range" id="sliderMotion" min="5" max="20" step="0.5" value="8.5" oninput="updateMotionThreshold(this.value)">
+                            </div>
+                        </div>
+
+                        <!-- Audio Sensitivity -->
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <strong>🎙️ Audio Sentinel (Scream / ~1s)</strong>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleAudioService" checked onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="slider-group">
+                                <label>Scream Loudness Threshold: <strong id="labelAudioThreshold">80 dB</strong></label>
+                                <input type="range" id="sliderAudio" min="60" max="95" step="1" value="80" oninput="updateAudioThreshold(this.value)">
+                            </div>
+                        </div>
+
+                        <!-- Alarm Audio & Vibration -->
+                        <div class="settings-card">
+                            <div class="settings-row">
+                                <strong>🚨 Sound High-Decibel Siren</strong>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleSirenSound" checked onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" style="margin-top: 12px;">
+                                <strong>📳 Emergency Vibration Pulse</strong>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleVibration" checked onchange="saveSettings()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SMS Template -->
+                        <div class="settings-card">
+                            <strong>✉️ Emergency SMS / Email Message Format</strong>
+                            <p class="setting-hint">Variables: {LOCATION}, {ACCURACY}, {TIME}</p>
+                            <textarea id="txtSmsTemplate" rows="3" class="template-textarea" onchange="saveSettings()"></textarea>
+                        </div>
+
+                        <div class="settings-card">
+                            <strong>📍 GPS Location Source</strong>
+                            <p class="setting-hint">Select a preset coordinate or use real phone GPS</p>
+                            <select id="selectLocationPreset" class="setting-select" onchange="changeLocationPreset(this.value)">
+                                <option value="bmsit">BMSIT Campus, Bangalore (13.1345, 77.5689)</option>
+                                <option value="delhi">Connaught Place, New Delhi (28.6315, 77.2167)</option>
+                                <option value="mumbai">Marine Drive, Mumbai (18.9438, 72.8234)</option>
+                                <option value="device">🛰️ Use Real Phone GPS Location</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Navigation Bar -->
+                <nav class="phone-bottom-nav">
+                    <button class="nav-item active" id="navHome" onclick="switchTab('tabHome')">
+                        <span class="nav-icon">🛡️</span>
+                        <span class="nav-label">Home</span>
+                    </button>
+                    <button class="nav-item" id="navSafeRoute" onclick="switchTab('tabSafeRoute')">
+                        <span class="nav-icon">🗺️</span>
+                        <span class="nav-label">Safe Route</span>
+                    </button>
+                    <button class="nav-item" id="navContacts" onclick="switchTab('tabContacts')">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Contacts</span>
+                    </button>
+                    <button class="nav-item" id="navSettings" onclick="switchTab('tabSettings')">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Settings</span>
+                    </button>
+                </nav>
+
+            </div>
+        </main>
+
+        <!-- Right Info Panel: Architecture & Project Details -->
+        <aside class="sidebar-panel">
+            <div class="panel-card">
+                <h3>📱 Deploy on Android Phone</h3>
+                <p class="panel-sub">Run directly on your physical Android phone with hardware accelerometer shake detection:</p>
+                <div class="phone-connect-box">
+                    <span class="connect-label">Local Wi-Fi Phone Address:</span>
+                    <code class="connect-url">http://192.168.1.6:5050</code>
+                    <button class="btn-copy-url" onclick="copyPhoneUrl()">📋 Copy URL for Phone</button>
+                </div>
+                <ul class="install-steps">
+                    <li>1. Connect phone to the same Wi-Fi network.</li>
+                    <li>2. Open <code>http://192.168.1.6:5050</code> in Chrome on your phone.</li>
+                    <li>3. Tap <strong>⋮ (Menu) ➔ Add to Home screen / Install</strong>.</li>
+                    <li>4. Shake your phone or shout <strong>"HELP"</strong> to trigger SOS!</li>
+                </ul>
+            </div>
+
+            <div class="panel-card">
+                <h3>📐 Architecture &amp; SDGs</h3>
+                <div class="arch-layer">
+                    <strong>SDG 11: Sustainable Cities &amp; Communities</strong>
+                    <p>Safe Route Finder provides accessible pedestrian routing to nearest police stations.</p>
+                </div>
+                <div class="arch-layer">
+                    <strong>SDG 16: Peace &amp; Strong Institutions</strong>
+                    <p>Rapid emergency alerting via dual SMS and Email response pathways.</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modal: Onboarding & Secret Code Word Setup -->
+    <div class="modal-backdrop" id="onboardingModal" style="display: none;" onclick="if(event.target.id==='onboardingModal') closeOnboardingModal()">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin: 0; font-size: 16px; color: white;">🛡️ SheSecure Setup</h3>
+                <button type="button" onclick="closeOnboardingModal()" style="background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0 4px;">✕</button>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+                Configure your safety profile, primary contact, and secret voice distress code word.
+            </p>
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="onboardingUserName" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label style="color: var(--accent-emerald); font-weight: bold;">🗣️ Secret Voice Code Word (Emergency Trigger)</label>
+                <input type="text" id="onboardingCodeWord" placeholder="e.g. HELP, SAVE ME, RED ALERT" style="text-transform: uppercase; font-weight: bold; color: var(--accent-emerald);">
+                <span style="font-size: 10px; color: var(--text-dim); margin-top: 2px; display: block;">
+                    Saying this secret word will trigger emergency SOS instantly.
+                </span>
+            </div>
+            <div class="form-group">
+                <label>Primary Emergency Contact Phone</label>
+                <input type="tel" id="onboardingGuardianPhone" placeholder="+91 98765 43210 (Direct SMS)">
+            </div>
+            <div class="form-group">
+                <label>Primary Emergency Contact Email</label>
+                <input type="email" id="onboardingGuardianEmail" placeholder="guardian@example.com (Email Alert)">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeOnboardingModal()">Skip / Cancel</button>
+                <button type="button" class="btn-modal-save" id="btnArmSheSecure" onclick="saveOnboardingSetup()">Arm SheSecure &amp; Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add / Edit Contact -->
+    <div class="modal-backdrop" id="contactModal" style="display: none;">
+        <div class="modal-box">
+            <h3>Add Emergency Contact</h3>
+            <div class="form-group">
+                <label>Contact Name</label>
+                <input type="text" id="modalContactName" placeholder="e.g. Parent, Sibling, Friend">
+            </div>
+            <div class="form-group">
+                <label>Phone Number (Direct SMS Alert)</label>
+                <input type="tel" id="modalContactPhone" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+                <label>Email Address (Email Alert)</label>
+                <input type="email" id="modalContactEmail" placeholder="contact@example.com">
+            </div>
+            <div class="form-group">
+                <label>Relationship</label>
+                <input type="text" id="modalContactRelation" placeholder="e.g. Mother, Roommate, Emergency">
+            </div>
+            <div class="form-group checkbox-row">
+                <label>
+                    <input type="checkbox" id="modalContactPrimary"> Set as Primary Contact
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeContactModal()">Cancel</button>
+                <button class="btn-modal-save" onclick="saveNewContact()">Save to Room DB</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Phone Deployment -->
+    <div class="modal-backdrop" id="phoneDeployModal" style="display: none;">
+        <div class="modal-box">
+            <h3>📱 Run SheSecure on Your Phone</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+                Open the secure address below in Chrome on your phone:
+            </p>
+            <div class="phone-connect-box" style="margin-bottom: 16px;">
+                <code class="connect-url" style="font-size: 15px;">http://192.168.1.6:5050</code>
+            </div>
+            <p style="font-size: 12px; color: var(--accent-emerald); line-height: 1.4; margin-bottom: 16px;">
+                ✨ Features on phone:<br>
+                • Real physical accelerometer shake detection (3 jerks)<br>
+                • Voice Keyword &amp; Shouting ("HELP") Sentinel<br>
+                • Safe route finder to police station with live GPS<br>
+                • Direct automated SMS &amp; Email alerts
+            </p>
+            <button class="btn-modal-save" style="width: 100%;" onclick="closePhoneDeployModal()">Got It!</button>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- SheSecure App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

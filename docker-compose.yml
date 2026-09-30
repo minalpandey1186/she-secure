@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: shesecure-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shesecure}
+      POSTGRES_USER: ${POSTGRES_USER:-shesecure_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shesecure_secret_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shesecure_user} -d ${POSTGRES_DB:-shesecure}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shesecure-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shesecure-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${SERVER_PORT:-4000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-shesecure_user}:${POSTGRES_PASSWORD:-shesecure_secret_password}@postgres:5432/${POSTGRES_DB:-shesecure}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_at_least_32_bytes_long}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      ENCRYPTION_MASTER_KEY_HEX: ${ENCRYPTION_MASTER_KEY_HEX:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      DEFAULT_KEY_ID: ${DEFAULT_KEY_ID:-key-v1}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shesecure-network
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: shesecure-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-5173}:80"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:4000/api/v1}
+    depends_on:
+      - backend
+    networks:
+      - shesecure-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  shesecure-network:
+    driver: bridge

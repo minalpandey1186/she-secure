@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/surface">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full Name"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etDialogName"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="e.g. Parent, Sibling, Friend"
+        android:textColorHint="@color/text_muted"
+        android:padding="10dp"
+        android:textColor="@color/text_primary"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone Number (SMS Fallback)"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etDialogPhone"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="+91 98765 43210"
+        android:textColorHint="@color/text_muted"
+        android:padding="10dp"
+        android:textColor="@color/text_primary"
+        android:inputType="phone"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email Address (Email Alerting)"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etDialogEmail"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="contact@example.com"
+        android:textColorHint="@color/text_muted"
+        android:padding="10dp"
+        android:textColor="@color/text_primary"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Relationship / Note"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etDialogRelation"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="e.g. Mother, Roommate, Emergency Service"
+        android:textColorHint="@color/text_muted"
+        android:padding="10dp"
+        android:textColor="@color/text_primary"
+        android:inputType="text"
+        android:layout_marginBottom="12dp" />
+
+    <CheckBox
+        android:id="@+id/cbDialogPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set as Primary Emergency Contact"
+        android:textColor="@color/text_primary" />
+
+</LinearLayout>

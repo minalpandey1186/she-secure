@@ -1,0 +1,17 @@
+{
+  "name": "@she-secure/shared",
+  "version": "1.0.0",
+  "description": "Shared contracts, schemas, and type definitions for SheSecure platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["emergency", "security", "steganography", "sos"],
+  "author": "SheSecure Engineering",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
