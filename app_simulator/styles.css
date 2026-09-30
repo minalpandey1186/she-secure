@@ -1465,3 +1465,107 @@ input:checked + .slider:before {
     font-weight: 700;
     cursor: pointer;
 }
+
+/* Premium SheSecure visual system */
+:root {
+    --bg-main: #0d0a12;
+    --bg-surface: #1a1521;
+    --bg-surface-light: #2a2232;
+    --primary-green: #9ed8b4;
+    --primary-dark: #315c48;
+    --accent-emerald: #b9e8c9;
+    --danger-red: #e98282;
+    --danger-dark: #54272f;
+    --warning-yellow: #e7c58b;
+    --text-main: #f7f1f4;
+    --text-muted: #b6aab8;
+    --text-dim: #786c7b;
+    --border-color: #382d3d;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 11px;
+}
+
+body {
+    background: radial-gradient(circle at 50% -10%, #2b2034 0, var(--bg-main) 38rem);
+}
+
+.project-header {
+    background: rgba(13, 10, 18, .88);
+    border-color: var(--border-color);
+    padding: 16px 32px;
+    backdrop-filter: blur(18px);
+}
+
+.badge-sdg { background: #2b2034; color: var(--accent-emerald); border: 1px solid #594665; }
+.project-header h1 { letter-spacing: .08em; }
+.project-header h1 span { color: var(--text-muted); font-size: 13px; letter-spacing: 0; }
+.header-right { flex-wrap: wrap; justify-content: flex-end; }
+.btn-demo-action { background: #1a1521; border-color: #403247; border-radius: 10px; }
+.btn-demo-action.btn-phone { background: #315c48; border-color: #79b990; }
+.btn-demo-action.btn-danger { background: #54272f; border-color: #9c5057; }
+
+.app-layout { padding: 30px; gap: 30px; }
+.panel-card, .smartphone-frame { background: #151019; border-color: #382d3d; }
+.panel-card { box-shadow: 0 18px 50px rgba(0,0,0,.18); }
+.sensor-test-box, .trigger-card, .nav-card, .status-pill-banner, .settings-card { background: #1a1521; border-color: #382d3d; }
+.sensor-test-box { padding: 14px; }
+.sensor-badge { background: rgba(158,216,180,.12); color: var(--accent-emerald); }
+.btn-sensor-action { background: #3b2d48; }
+.btn-sensor-subaction { color: var(--accent-emerald); border-color: #584563; }
+
+.smartphone-frame { border-radius: 42px; box-shadow: 0 30px 90px rgba(0,0,0,.55), 0 0 0 10px #211a28, 0 0 0 12px #3b3041; }
+.phone-notch, .phone-screen { background: #151019; }
+.tab-view { padding: 22px 19px 18px; }
+.brand { gap: 10px; }
+.shield-icon { filter: grayscale(1) brightness(1.8); }
+.brand h2 { letter-spacing: .1em; font-size: 15px; }
+.brand-sub { color: var(--text-muted); }
+.btn-icon, .btn-back, .btn-header-refresh { background: #211a28; border-color: #493a50; }
+.status-pill-banner { border-color: #496050; background: linear-gradient(90deg, rgba(67,104,79,.28), rgba(26,21,33,.7)); }
+.btn-hero-mic { background: rgba(158,216,180,.08); border-color: #52755e; color: #c9f2d7; }
+
+.sos-container { margin: 26px 0 32px; }
+.giant-sos-button { width: 168px; height: 168px; background: linear-gradient(145deg, #6f3b4c, #3f222e); border: 1px solid #ba6974; box-shadow: 0 18px 45px rgba(106,45,63,.28), inset 0 1px rgba(255,255,255,.18); }
+.giant-sos-button::before { content: ''; position: absolute; width: 188px; height: 188px; border: 1px solid rgba(185,105,116,.25); border-radius: 50%; animation: safetyOrbit 3.5s ease-in-out infinite; }
+.giant-sos-button { position: relative; }
+.sos-text { font-size: 38px; letter-spacing: .08em; }
+.sos-sub { color: #f2d8dc; font-size: 10px; }
+.sos-timer-hint { color: #dbaab1; }
+@keyframes safetyOrbit { 0%,100% { transform: scale(.96); opacity: .45; } 50% { transform: scale(1.05); opacity: .9; } }
+
+.section-title { color: #88788c; letter-spacing: .12em; }
+.trigger-card, .nav-card { transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+.trigger-card:hover, .nav-card:hover { transform: translateY(-2px); border-color: #82678e; background: #211a28; }
+.trigger-icon, .nav-card-icon, .nav-card-arrow { filter: grayscale(.55); }
+.status-green { color: var(--accent-emerald); }
+.nav-card-content strong, .trigger-info strong { font-weight: 700; }
+
+.phone-bottom-nav { background: rgba(13,10,18,.95); border-color: #382d3d; height: 66px; }
+.nav-item { color: #766b79; min-width: 64px; padding: 5px 8px; border-radius: 12px; }
+.nav-item.active { color: var(--accent-emerald); background: rgba(158,216,180,.08); }
+.nav-icon { font-size: 16px; filter: grayscale(.6); }
+
+.sos-flow-panel { padding: 18px 4px; }
+.sos-alert-header h3 { color: var(--danger-red); letter-spacing: .07em; font-size: 15px; }
+.circular-countdown-wrap { margin: 32px 0; }
+.circle-bg { stroke: #2b202b; }
+.circle-progress { stroke: var(--danger-red); }
+.countdown-number { color: #f1a0a0; }
+.btn-cancel-sos { background: #2b202b; border-color: #7c4b58; }
+.active-sos-banner { background: linear-gradient(135deg, #54272f, #2c1a25); border: 1px solid #86505b; }
+.fail-visibly-card { background: #100c13; border-color: #443444; }
+.fail-visibly-header { background: #211923; }
+.btn-fallback-action { background: rgba(158,216,180,.08); border-color: #52755e; color: #c9f2d7; }
+.btn-control-action.btn-danger-action { background: #71353d; }
+
+.map-container-wrap, #safeRouteMap { border-radius: 16px; overflow: hidden; border: 1px solid #493a50; }
+.info-callout, .radius-status-banner { background: rgba(158,216,180,.08); border-color: #496050; color: #c9f2d7; }
+.btn-add-contact { background: #9ed8b4; color: #122117; }
+.modal-box { background: #1a1521; border-color: #493a50; box-shadow: 0 25px 80px rgba(0,0,0,.5); }
+.setting-input, .template-textarea, .setting-select, .form-group input[type="text"], .form-group input[type="tel"], .form-group input[type="email"] { background: #100c13; border-color: #493a50; }
+
+@media (max-width: 768px) {
+    .phone-screen { background: #151019; }
+    .tab-view { padding: 20px 16px 16px; }
+}
